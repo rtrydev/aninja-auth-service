@@ -21,15 +21,13 @@ namespace aninja_auth_service.Repositories
         public async Task<User?> GetUserByCreditionals(string username, string password)
         {
             var result = await _users.FindAsync<User>(x => x.Name == username && x.Password == password);
-            if(!result.Any()) return null;
-            return await result.FirstAsync();
+            return await result.FirstOrDefaultAsync();
         }
 
         public async Task<User?> GetUserById(Guid id)
         {
             var result = await _users.FindAsync<User>(x => x.Id == id);
-            if (!result.Any()) return null;
-            return await result.FirstAsync();
+            return await result.FirstOrDefaultAsync();
         }
 
         public async Task<User?> UpdateUser(User user)
