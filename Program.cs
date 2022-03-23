@@ -1,5 +1,8 @@
 using aninja_auth_service.Authorization;
+using aninja_auth_service.Repositories;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
@@ -7,10 +10,21 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
+builder.Services.AddLogging();
 
-builder.Services.AddAuthentication(options => options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddSingleton<IJwtService, JwtService>();
+builder.Services.AddSingleton<IMongoClient>(new MongoClient(builder.Configuration.GetConnectionString("MongoDB")));
+
+builder.Services.AddTransient<IUserRepository, UserRepository>();
+
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddAuthentication(options => options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options => {
         options.RequireHttpsMetadata = false;
         options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters()
@@ -20,15 +34,8 @@ builder.Services.AddAuthentication(options => options.DefaultAuthenticateScheme 
             ValidateIssuer = false,
             ValidateAudience = false
         };
-    });
-// Add services to the container.
-builder.Services.AddLogging();
-builder.Services.AddSingleton<IJwtService, JwtService>();
-builder.Services.AddSingleton<IMongoClient>(new MongoClient(builder.Configuration.GetConnectionString("MongoDB")));
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
+    }
+);
 builder.Services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
