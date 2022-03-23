@@ -18,7 +18,7 @@ namespace aninja_auth_service.Repositories
             await _users.InsertOneAsync(user);
         }
 
-        public async Task<User?> GetUserByCreditionals(string username, string password)
+        public async Task<User?> GetUserByCredentials(string username, string password)
         {
             var result = await _users.FindAsync<User>(x => x.Name == username && x.Password == password);
             return await result.FirstOrDefaultAsync();
