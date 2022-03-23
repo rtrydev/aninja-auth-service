@@ -24,15 +24,40 @@ namespace aninja_auth_service.Authorization
             }
             var key = Encoding.ASCII.GetBytes(jwtSecret);
 
+            var jwtExpireTime = Environment.GetEnvironmentVariable("JWT_EXPIREMINUTES");
+            if (jwtExpireTime is null)
+            {
+                _logger.LogError("The JWT_EXPIREMINUTES environmental variable has not been set");
+                return null;
+            }
+            int parsedExpireTime = -1;
+            int.TryParse(jwtExpireTime.ToString(), out parsedExpireTime);
+
+            if (parsedExpireTime < 0)
+            {
+                _logger.LogError("The JWT_EXPIREMINUTES environmental variable has incorrect value");
+                return null;
+            }
+
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
                 Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id.ToString()) }),
-                Expires = DateTime.UtcNow.AddHours(3),
+                Expires = DateTime.UtcNow.AddMinutes(parsedExpireTime),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+        public bool ExpiredOrWillSoonExpire(string token)
+        {
+            var jwtToken = new JwtSecurityToken(token);
+            if (jwtToken is null) return true;
+            if(jwtToken.ValidTo < DateTime.UtcNow.AddMinutes(30)) return true;
+            if (jwtToken.ValidFrom > DateTime.UtcNow) return true;
+            return false;
+        }
+
     }
 }
