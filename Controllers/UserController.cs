@@ -1,6 +1,7 @@
 ﻿using aninja_auth_service.Authorization;
 using aninja_auth_service.Commands;
 using aninja_auth_service.Dtos;
+using aninja_auth_service.Queries;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -38,6 +39,15 @@ namespace aninja_auth_service.Controllers
             var request = new UserRegisterCommand() { Email = userRegister.Email, Name = userRegister.Name, Password = userRegister.Password };
             var result = await _mediator.Send(request);
             if (result is null) return Forbid();
+            return Ok(_mapper.Map<UserDto>(result));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserDto>> GetUserById(string id)
+        {
+            var request = new GetUserByIdQuery() { Id = new Guid(id) };
+            var result = await _mediator.Send(request);
+            if(result is null) return NotFound();
             return Ok(_mapper.Map<UserDto>(result));
         }
     }
