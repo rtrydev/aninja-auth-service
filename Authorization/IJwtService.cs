@@ -5,6 +5,6 @@ namespace aninja_auth_service.Authorization
     public interface IJwtService
     {
         public string? GetJwtToken(User user);
-        public bool ExpiredOrWillSoonExpire(string token);
+        public bool WillSoonExpire(string token);
     }
 }

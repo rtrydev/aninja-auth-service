@@ -41,7 +41,7 @@ namespace aninja_auth_service.Authorization
 
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
-                Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id.ToString()) }),
+                Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id.ToString()), new Claim("role", user.Role) }),
                 Expires = DateTime.UtcNow.AddMinutes(parsedExpireTime),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
@@ -50,11 +50,11 @@ namespace aninja_auth_service.Authorization
             return tokenHandler.WriteToken(token);
         }
 
-        public bool ExpiredOrWillSoonExpire(string token)
+        public bool WillSoonExpire(string token)
         {
             var jwtToken = new JwtSecurityToken(token);
             if (jwtToken is null) return true;
-            if(jwtToken.ValidTo < DateTime.UtcNow.AddMinutes(30)) return true;
+            if(jwtToken.ValidTo < DateTime.UtcNow.AddMinutes(30) && jwtToken.ValidTo > DateTime.UtcNow) return true;
             if (jwtToken.ValidFrom > DateTime.UtcNow) return true;
             return false;
         }

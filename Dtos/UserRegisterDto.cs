@@ -1,12 +1,9 @@
-﻿namespace aninja_auth_service.Models
+﻿namespace aninja_auth_service.Dtos
 {
-    public class User
+    public class UserRegisterDto
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public string Role { get; set; }
-
     }
 }

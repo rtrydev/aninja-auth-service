@@ -8,5 +8,6 @@ namespace aninja_auth_service.Repositories
         public Task CreateUser(User user);
         public Task<User?> GetUserById(Guid id);
         public Task<User?> UpdateUser(User user);
+        public Task<bool> Exists(User user);
     }
 }

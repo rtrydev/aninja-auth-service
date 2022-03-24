@@ -18,6 +18,12 @@ namespace aninja_auth_service.Repositories
             await _users.InsertOneAsync(user);
         }
 
+        public async Task<bool> Exists(User user)
+        {
+            var result = await _users.FindAsync(x => x.Name == user.Name || x.Email == user.Email);
+            return result.Any();
+        }
+
         public async Task<User?> GetUserByCredentials(string username, string password)
         {
             var result = await _users.FindAsync<User>(x => x.Name == username && x.Password == password);
