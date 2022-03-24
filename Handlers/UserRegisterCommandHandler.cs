@@ -18,7 +18,7 @@ namespace aninja_auth_service.Handlers
             {
                 Id = Guid.NewGuid(),
                 Name = request.Name,
-                Email = request.Email,
+                Email = request.Email.Trim().ToLower(),
                 Password = request.Password
             };
             if (await _userRepository.Exists(user))
