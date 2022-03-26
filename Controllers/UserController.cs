@@ -45,7 +45,16 @@ namespace aninja_auth_service.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDto>> GetUserById(string id)
         {
-            var request = new GetUserByIdQuery() { Id = new Guid(id) };
+            Guid guid;
+            try
+            {
+                guid = Guid.Parse(id);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
+            var request = new GetUserByIdQuery() { Id = guid };
             var result = await _mediator.Send(request);
             if(result is null) return NotFound();
             return Ok(_mapper.Map<UserDto>(result));
