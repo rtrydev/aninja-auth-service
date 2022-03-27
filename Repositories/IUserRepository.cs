@@ -7,6 +7,7 @@ namespace aninja_auth_service.Repositories
         public Task<User?> GetUserByCredentials(string username, string password);
         public Task CreateUser(User user);
         public Task<User?> GetUserById(Guid id);
+        public Task<User?> GetUserByName(string username);
         public Task<User?> UpdateUser(User user);
         public Task<bool> Exists(User user);
     }

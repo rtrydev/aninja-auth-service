@@ -27,13 +27,16 @@ namespace aninja_auth_service.Repositories
 
         public async Task<User?> GetUserByCredentials(string username, string password)
         {
-            var user = await (await _users.FindAsync<User>(x => x.Name == username)).FirstOrDefaultAsync();
-            if (user == null) return null;
-            var userPassword = user.Password;
-            var passwordSalt = user.PasswordSalt;
-            var hashedPass = Hasher.HashPassword(password, passwordSalt);
-            if(hashedPass == userPassword) return user;
+            var user = await _users.FindAsync<User>(x => x.Name == username && x.Password == password);
+            var result = await user.FirstOrDefaultAsync();
             return null;
+        }
+
+        public async Task<User?> GetUserByName(string username)
+        {
+            var user = await _users.FindAsync<User>(x => x.Name == username);
+            var result = await user.FirstOrDefaultAsync();
+            return result;
         }
 
         public async Task<User?> GetUserById(Guid id)
