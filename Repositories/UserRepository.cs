@@ -29,7 +29,7 @@ namespace aninja_auth_service.Repositories
         {
             var user = await _users.FindAsync<User>(x => x.Name == username && x.Password == password);
             var result = await user.FirstOrDefaultAsync();
-            return null;
+            return result;
         }
 
         public async Task<User?> GetUserByName(string username)
