@@ -1,4 +1,5 @@
 ﻿using aninja_auth_service.Commands;
+using aninja_auth_service.Helpers;
 using aninja_auth_service.Models;
 using aninja_auth_service.Repositories;
 using MediatR;
@@ -14,12 +15,14 @@ namespace aninja_auth_service.Handlers
         }
         public async Task<User?> Handle(UserRegisterCommand request, CancellationToken cancellationToken)
         {
+            var hashedPass = Hasher.HashPassword(request.Password);
             var user = new User()
             {
                 Id = Guid.NewGuid(),
                 Name = request.Name,
                 Email = request.Email.Trim().ToLower(),
-                Password = request.Password,
+                Password = hashedPass.password,
+                PasswordSalt = hashedPass.salt,
                 Role = "User"
             };
             if (await _userRepository.Exists(user))

@@ -1,4 +1,5 @@
-﻿using aninja_auth_service.Models;
+﻿using aninja_auth_service.Helpers;
+using aninja_auth_service.Models;
 using MongoDB.Driver;
 
 namespace aninja_auth_service.Repositories
@@ -26,8 +27,13 @@ namespace aninja_auth_service.Repositories
 
         public async Task<User?> GetUserByCredentials(string username, string password)
         {
-            var result = await _users.FindAsync<User>(x => x.Name == username && x.Password == password);
-            return await result.FirstOrDefaultAsync();
+            var user = await (await _users.FindAsync<User>(x => x.Name == username)).FirstOrDefaultAsync();
+            if (user == null) return null;
+            var userPassword = user.Password;
+            var passwordSalt = user.PasswordSalt;
+            var hashedPass = Hasher.HashPassword(password, passwordSalt);
+            if(hashedPass == userPassword) return user;
+            return null;
         }
 
         public async Task<User?> GetUserById(Guid id)
